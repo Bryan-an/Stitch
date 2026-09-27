@@ -9,10 +9,19 @@ struct ContentView: View {
                 .font(.system(size: 120, weight: .bold, design: .rounded))
                 .monospacedDigit()
 
-            Button("Add row", systemImage: "plus") {
-                count += 1
+            HStack(spacing: 16) {
+                Button("Remove row", systemImage: "minus") {
+                    count -= 1
+                }
+                .buttonStyle(.bordered)
+                .labelStyle(.iconOnly)
+                .disabled(count == 0)
+
+                Button("Add row", systemImage: "plus") {
+                    count += 1
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
             .controlSize(.extraLarge)
         }
     }
