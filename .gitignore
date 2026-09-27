@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific data
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Build output
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager
+# Package.resolved is intentionally tracked so dependency versions stay reproducible.
+.build/
+
+# Claude Code personal settings
+.claude/settings.local.json
