@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var count = 0
+    @AppStorage("rowCount") private var count = 0
     @State private var isShowingResetAlert = false
 
     var body: some View {
