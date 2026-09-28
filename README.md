@@ -6,7 +6,7 @@ Stitch keeps track of rows while knitting: one big number, one big button to add
 
 ## Status
 
-Early stage. The Xcode project is scaffolded and the MVP is in progress; `ContentView.swift` still contains the default template.
+MVP features are implemented: add and remove rows, reset with confirmation, and a count that persists across launches. Layout polish (tap target size, iPad and Vision layouts) is next.
 
 ## MVP scope
 

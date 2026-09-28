@@ -11,14 +11,14 @@ Stitch is a minimal SwiftUI knitting row counter and a learning project for nati
 No dependencies, no package manager, no test target yet. The scheme `Stitch` is auto-generated (not shared).
 
 ```bash
-xcodebuild -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' build
 ```
 
 The deployment target is iOS 27.0, so the simulator runtime must be iOS 27+. If a test target is added later, run a single test with `-only-testing:<TestTarget>/<TestClass>/<testMethod>` on `xcodebuild test`.
 
 ## Architecture and build settings that matter
 
-- Entry point is `Stitch/MyApp.swift` (`@main struct MyApp`), which shows `ContentView`. `ContentView.swift` is still the Xcode template (includes a `#Playground` block via `import Playgrounds`).
+- Entry point is `Stitch/MyApp.swift` (`@main struct MyApp`), which shows `ContentView`. `ContentView.swift` holds the whole MVP: the count is `@AppStorage("rowCount")` (persisted in `UserDefaults`), and transient UI state such as the reset alert flag is `@State`. Don't rename the `"rowCount"` key: existing saved counts would be lost.
 - The project uses folder-synchronized groups (`PBXFileSystemSynchronizedRootGroup`): new files in `Stitch/` are picked up automatically. Never edit `project.pbxproj` to add files.
 - Swift 5 language mode, but with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and `SWIFT_APPROACHABLE_CONCURRENCY = YES`: types are implicitly `@MainActor` unless marked otherwise (`nonisolated`).
 - `SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES`: each file must explicitly import the modules whose members it uses.
