@@ -47,6 +47,9 @@ struct ContentView: View {
         }
         .padding()
         .frame(maxWidth: 500)
+        .sensoryFeedback(trigger: count) { oldValue, newValue in
+            newValue > oldValue ? .impact(weight: .medium) : .impact(weight: .light)
+        }
         .alert("Reset the counter?", isPresented: $isShowingResetAlert) {
             Button("Reset", role: .destructive) {
                 count = 0

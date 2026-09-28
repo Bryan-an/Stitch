@@ -59,7 +59,7 @@ Stitch/
 
 Ideas for after the MVP, roughly in order. None of them are commitments.
 
-- [ ] Haptic feedback on each tap (`.sensoryFeedback`)
+- [x] Haptic feedback on each tap (`.sensoryFeedback`)
 - [ ] Keep the screen awake while counting
 - [ ] Custom app icon
 - [ ] Multiple knitting projects, each with its own counter (SwiftData)
