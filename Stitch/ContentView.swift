@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var count = 0
+    @State private var isShowingResetAlert = false
 
     var body: some View {
         VStack(spacing: 32) {
@@ -23,6 +24,19 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
             }
             .controlSize(.extraLarge)
+
+            Button("Reset", role: .destructive) {
+                isShowingResetAlert = true
+            }
+            .disabled(count == 0)
+        }
+        .alert("Reset the counter?", isPresented: $isShowingResetAlert) {
+            Button("Reset", role: .destructive) {
+                count = 0
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("The row count will go back to 0.")
         }
     }
 }
