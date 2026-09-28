@@ -25,6 +25,7 @@ Deployment targets are iOS, macOS and visionOS 27.0, so the simulator runtime mu
 - Swift 5 language mode, but with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and `SWIFT_APPROACHABLE_CONCURRENCY = YES`: types are implicitly `@MainActor` unless marked otherwise (`nonisolated`).
 - `SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES`: each file must explicitly import the modules whose members it uses.
 - Platforms: iPhone, iPad, Vision (`TARGETED_DEVICE_FAMILY = 1,2,7`) and native macOS (`SUPPORTED_PLATFORMS` includes `macosx`); layouts must work on all of them. UIKit does not exist on macOS, so wrap UIKit imports and calls in `#if canImport(UIKit)` (see the idle-timer code in `ContentView`).
+- App icon is `Stitch/AppIcon.icon`, an Icon Composer file selected by `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`; it covers iPhone, iPad and Mac but not visionOS. Its source SVG layers live in `Design/AppIcon/`, outside `Stitch/` so they aren't bundled into the app. Edit the icon in Icon Composer rather than hand-editing `icon.json`.
 - Bundle identifier is an Xcode placeholder; signing team is not set.
 
 ## Conventions

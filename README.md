@@ -38,7 +38,9 @@ Stitch/
 ├── Stitch/
 │   ├── MyApp.swift          # App entry point (@main)
 │   ├── ContentView.swift    # Main (and currently only) screen
-│   └── Assets.xcassets/     # App icon and accent color
+│   ├── AppIcon.icon/        # App icon (Icon Composer)
+│   └── Assets.xcassets/     # Accent color
+├── Design/AppIcon/          # Source SVG layers for the icon
 └── Stitch.xcodeproj/
 ```
 
@@ -61,7 +63,7 @@ Ideas for after the MVP, roughly in order. None of them are commitments.
 
 - [x] Haptic feedback on each tap (`.sensoryFeedback`)
 - [x] Keep the screen awake while counting (iOS, iPadOS and visionOS)
-- [ ] Custom app icon
+- [x] Custom app icon (iPhone, iPad and Mac; visionOS still needs its own icon)
 - [ ] Multiple knitting projects, each with its own counter (SwiftData)
 - [ ] Target row count and pattern-repeat reminders
 - [ ] Spanish localization through a String Catalog
