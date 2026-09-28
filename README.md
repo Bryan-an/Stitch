@@ -6,7 +6,7 @@ Stitch keeps track of rows while knitting: one big number, one big button to add
 
 ## Status
 
-MVP features are implemented: add and remove rows, reset with confirmation, and a count that persists across launches. Layout polish (tap target size, iPad and Vision layouts) is next.
+MVP complete: add and remove rows, reset with confirmation, a count that persists across launches, and a layout with large tap targets that adapts to iPad. Tested on iPhone and iPad simulators; iPhone landscape and Apple Vision are not verified yet. Next up is the roadmap below.
 
 ## MVP scope
 
