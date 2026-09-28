@@ -25,8 +25,8 @@ One screen, one counter. Everything else is out of scope for the first version.
 | Language | Swift (Swift 5 language mode) |
 | UI | SwiftUI |
 | Persistence | `@AppStorage` for the MVP; SwiftData planned for multiple projects |
-| Deployment target | iOS 27.0 |
-| Device families | iPhone, iPad, Apple Vision (`TARGETED_DEVICE_FAMILY = 1,2,7`) |
+| Deployment target | iOS 27.0, macOS 27.0, visionOS 27.0 |
+| Platforms | iPhone, iPad, Apple Vision (`TARGETED_DEVICE_FAMILY = 1,2,7`) and native macOS |
 | Dependencies | None |
 
 The project uses Xcode's folder-synchronized groups (`PBXFileSystemSynchronizedRootGroup`): any file added to the `Stitch/` folder on disk is picked up automatically, so `project.pbxproj` never needs to be edited by hand.
@@ -60,7 +60,7 @@ Stitch/
 Ideas for after the MVP, roughly in order. None of them are commitments.
 
 - [x] Haptic feedback on each tap (`.sensoryFeedback`)
-- [ ] Keep the screen awake while counting
+- [x] Keep the screen awake while counting (iOS, iPadOS and visionOS)
 - [ ] Custom app icon
 - [ ] Multiple knitting projects, each with its own counter (SwiftData)
 - [ ] Target row count and pattern-repeat reminders

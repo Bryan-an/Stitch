@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct ContentView: View {
     @AppStorage("rowCount") private var count = 0
@@ -50,6 +53,14 @@ struct ContentView: View {
         .sensoryFeedback(trigger: count) { oldValue, newValue in
             newValue > oldValue ? .impact(weight: .medium) : .impact(weight: .light)
         }
+        #if canImport(UIKit)
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+        #endif
         .alert("Reset the counter?", isPresented: $isShowingResetAlert) {
             Button("Reset", role: .destructive) {
                 count = 0

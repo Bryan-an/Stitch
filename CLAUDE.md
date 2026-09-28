@@ -14,7 +14,9 @@ No dependencies, no package manager, no test target yet. The scheme `Stitch` is 
 xcodebuild -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' build
 ```
 
-The deployment target is iOS 27.0, so the simulator runtime must be iOS 27+. If a test target is added later, run a single test with `-only-testing:<TestTarget>/<TestClass>/<testMethod>` on `xcodebuild test`.
+Also check the other platforms compile by swapping the destination for `'platform=macOS'` or `'generic/platform=visionOS Simulator'` (no visionOS simulator runtime is installed, but the SDK is).
+
+Deployment targets are iOS, macOS and visionOS 27.0, so the simulator runtime must be iOS 27+. If a test target is added later, run a single test with `-only-testing:<TestTarget>/<TestClass>/<testMethod>` on `xcodebuild test`.
 
 ## Architecture and build settings that matter
 
@@ -22,7 +24,7 @@ The deployment target is iOS 27.0, so the simulator runtime must be iOS 27+. If 
 - The project uses folder-synchronized groups (`PBXFileSystemSynchronizedRootGroup`): new files in `Stitch/` are picked up automatically. Never edit `project.pbxproj` to add files.
 - Swift 5 language mode, but with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and `SWIFT_APPROACHABLE_CONCURRENCY = YES`: types are implicitly `@MainActor` unless marked otherwise (`nonisolated`).
 - `SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES`: each file must explicitly import the modules whose members it uses.
-- Device families: iPhone, iPad, Vision (`1,2,7`); layouts must work on all three.
+- Platforms: iPhone, iPad, Vision (`TARGETED_DEVICE_FAMILY = 1,2,7`) and native macOS (`SUPPORTED_PLATFORMS` includes `macosx`); layouts must work on all of them. UIKit does not exist on macOS, so wrap UIKit imports and calls in `#if canImport(UIKit)` (see the idle-timer code in `ContentView`).
 - Bundle identifier is an Xcode placeholder; signing team is not set.
 
 ## Conventions
