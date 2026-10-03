@@ -1,77 +1,38 @@
+import SwiftData
 import SwiftUI
-#if canImport(UIKit)
-import UIKit
-#endif
 
 struct ContentView: View {
-    @AppStorage("rowCount") private var count = 0
-    @State private var isShowingResetAlert = false
+    @Query(sort: \KnittingProject.updatedAt, order: .reverse)
+    private var projects: [KnittingProject]
 
-    private let buttonHeight: CGFloat = 72
+    @State private var selection: UUID?
+
+    private var selectedProject: KnittingProject? {
+        projects.first { $0.id == selection }
+    }
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-
-            Text("\(count)")
-                .font(.system(size: 160, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.4)
-
-            Spacer()
-
-            HStack(spacing: 16) {
-                Button {
-                    count -= 1
-                } label: {
-                    Label("Remove row", systemImage: "minus")
-                        .labelStyle(.iconOnly)
-                        .frame(minWidth: buttonHeight, minHeight: buttonHeight)
-                }
-                .buttonStyle(.bordered)
-                .disabled(count == 0)
-
-                Button {
-                    count += 1
-                } label: {
-                    Label("Add row", systemImage: "plus")
-                        .frame(maxWidth: .infinity, minHeight: buttonHeight)
-                }
-                .buttonStyle(.borderedProminent)
+        NavigationSplitView {
+            ProjectListView(projects: projects, selection: $selection)
+        } detail: {
+            if let selectedProject {
+                CounterView(project: selectedProject)
+                    // A new identity per project, so switching projects builds a
+                    // fresh counter instead of reusing the old one (which would
+                    // fire the haptic because rowCount "changed").
+                    .id(selectedProject.id)
+            } else {
+                ContentUnavailableView(
+                    "Select a Project",
+                    systemImage: "list.bullet",
+                    description: Text("Choose a project from the list, or create a new one.")
+                )
             }
-            .font(.title2.weight(.semibold))
-            .controlSize(.extraLarge)
-
-            Button("Reset", role: .destructive) {
-                isShowingResetAlert = true
-            }
-            .disabled(count == 0)
-        }
-        .padding()
-        .frame(maxWidth: 500)
-        .sensoryFeedback(trigger: count) { oldValue, newValue in
-            newValue > oldValue ? .impact(weight: .medium) : .impact(weight: .light)
-        }
-        #if canImport(UIKit)
-        .onAppear {
-            UIApplication.shared.isIdleTimerDisabled = true
-        }
-        .onDisappear {
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-        #endif
-        .alert("Reset the counter?", isPresented: $isShowingResetAlert) {
-            Button("Reset", role: .destructive) {
-                count = 0
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("The row count will go back to 0.")
         }
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(PreviewData.container)
 }
