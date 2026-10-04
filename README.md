@@ -2,11 +2,11 @@
 
 A minimal row counter for knitting, built with SwiftUI.
 
-Stitch keeps track of rows while knitting: one big number, one big button to add a row, and nothing else in the way. It is a small personal project and a hands-on way to practice native iOS development.
+Stitch keeps track of rows while knitting: a list of your projects, and for each one a big number, one big button to add a row, and nothing else in the way. It is a small personal project and a hands-on way to practice native iOS development.
 
 ## Status
 
-MVP complete: add and remove rows, reset with confirmation, a count that persists across launches, and a layout with large tap targets that adapts to iPad. Tested on iPhone and iPad simulators; iPhone landscape and Apple Vision are not verified yet. Next up is the roadmap below.
+MVP complete, plus multiple projects: each knitting project has its own row count (stored with SwiftData), projects can be created, renamed and deleted, and the app reopens where you left off. Tested on iPhone and iPad simulators; iPhone landscape and Apple Vision are not verified yet.
 
 ## MVP scope
 
@@ -14,7 +14,7 @@ MVP complete: add and remove rows, reset with confirmation, a count that persist
 - **+** button to add a row (primary action, largest tap target)
 - **−** button to undo a row; disabled at 0 so the count never goes negative
 - **Reset** button with a confirmation alert, so progress is never lost by accident
-- The count persists across app launches (`@AppStorage` / `UserDefaults`)
+- The count persists across app launches
 
 One screen, one counter. Everything else is out of scope for the first version.
 
@@ -24,23 +24,30 @@ One screen, one counter. Everything else is out of scope for the first version.
 | --- | --- |
 | Language | Swift (Swift 5 language mode) |
 | UI | SwiftUI |
-| Persistence | `@AppStorage` for the MVP; SwiftData planned for multiple projects |
+| Persistence | SwiftData (`KnittingProject`); `@AppStorage` only for the selected project |
 | Deployment target | iOS 27.0, macOS 27.0, visionOS 27.0 |
 | Platforms | iPhone, iPad, Apple Vision (`TARGETED_DEVICE_FAMILY = 1,2,7`) and native macOS |
 | Dependencies | None |
+| Tests | Swift Testing (`StitchTests` target) |
 
-The project uses Xcode's folder-synchronized groups (`PBXFileSystemSynchronizedRootGroup`): any file added to the `Stitch/` folder on disk is picked up automatically, so `project.pbxproj` never needs to be edited by hand.
+The project uses Xcode's folder-synchronized groups (`PBXFileSystemSynchronizedRootGroup`): any file added to the `Stitch/` or `StitchTests/` folder on disk is picked up automatically, so `project.pbxproj` never needs to be edited by hand.
 
 ## Project structure
 
 ```
 Stitch/
 ├── Stitch/
-│   ├── MyApp.swift          # App entry point (@main)
-│   ├── ContentView.swift    # Main (and currently only) screen
-│   ├── AppIcon.icon/        # App icon (Icon Composer)
-│   └── Assets.xcassets/     # Accent color
-├── Design/AppIcon/          # Source SVG layers for the icon
+│   ├── MyApp.swift            # App entry point (@main), SwiftData container
+│   ├── ContentView.swift      # Split view: project list + counter
+│   ├── ProjectListView.swift  # List, create, rename, delete
+│   ├── NewProjectView.swift   # New-project sheet
+│   ├── CounterView.swift      # Counter for one project
+│   ├── KnittingProject.swift  # SwiftData model and counting rules
+│   ├── PreviewData.swift      # In-memory sample data for previews
+│   ├── AppIcon.icon/          # App icon (Icon Composer)
+│   └── Assets.xcassets/       # Accent color
+├── StitchTests/               # Swift Testing tests for the model
+├── Design/AppIcon/            # Source SVG layers for the icon
 └── Stitch.xcodeproj/
 ```
 
@@ -48,7 +55,7 @@ Stitch/
 
 1. Open `Stitch.xcodeproj` in Xcode.
 2. Select an iPhone simulator as the run destination.
-3. Press **⌘R** to build and run.
+3. Press **⌘R** to build and run, or **⌘U** to run the tests.
 
 ### Running on a physical device
 
@@ -64,7 +71,7 @@ Ideas for after the MVP, roughly in order. None of them are commitments.
 - [x] Haptic feedback on each tap (`.sensoryFeedback`)
 - [x] Keep the screen awake while counting (iOS, iPadOS and visionOS)
 - [x] Custom app icon (iPhone, iPad and Mac; visionOS still needs its own icon)
-- [ ] Multiple knitting projects, each with its own counter (SwiftData)
+- [x] Multiple knitting projects, each with its own counter (SwiftData)
 - [ ] Target row count and pattern-repeat reminders
 - [ ] Spanish localization through a String Catalog
 
