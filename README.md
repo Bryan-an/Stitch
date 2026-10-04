@@ -4,6 +4,10 @@ A minimal row counter for knitting, built with SwiftUI.
 
 Stitch keeps track of rows while knitting: a list of your projects, and for each one a big number, one big button to add a row, and nothing else in the way. It is a small personal project and a hands-on way to practice native iOS development.
 
+## Demo
+
+https://github.com/user-attachments/assets/460cc218-50af-4db8-8672-1b80eb1a7fef
+
 ## Status
 
 MVP complete, plus multiple projects: each knitting project has its own row count (stored with SwiftData), projects can be created, renamed and deleted, and the app reopens where you left off. Tested on iPhone and iPad simulators; iPhone landscape and Apple Vision are not verified yet.
