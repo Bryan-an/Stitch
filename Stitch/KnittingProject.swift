@@ -11,6 +11,8 @@ final class KnittingProject {
     var createdAt: Date
     // The last time the count changed. Renaming does not update it.
     var updatedAt: Date
+    // nil means no target. When set, it is always at least 1.
+    private(set) var targetRowCount: Int?
 
     init(name: String) {
         let now = Date.now
@@ -35,5 +37,15 @@ final class KnittingProject {
     func reset() {
         rowCount = 0
         updatedAt = .now
+    }
+
+    // The only way to change the target. 0, negatives and nil remove it.
+    // It does not touch updatedAt, which tracks changes to the count.
+    func setTarget(_ target: Int?) {
+        if let target, target >= 1 {
+            targetRowCount = target
+        } else {
+            targetRowCount = nil
+        }
     }
 }
