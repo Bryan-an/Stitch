@@ -48,4 +48,16 @@ final class KnittingProject {
             targetRowCount = nil
         }
     }
+
+    var isTargetReached: Bool {
+        guard let targetRowCount else { return false }
+        return rowCount >= targetRowCount
+    }
+
+    // 0...1 toward the target, or nil without one. Capped at 1 past the target.
+    // Converted to Double first: Int division would truncate (60 / 120 is 0).
+    var progress: Double? {
+        guard let targetRowCount else { return nil }
+        return min(Double(rowCount) / Double(targetRowCount), 1)
+    }
 }

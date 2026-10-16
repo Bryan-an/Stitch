@@ -168,4 +168,58 @@ struct KnittingProjectTests {
         #expect(savedHat !== hat)
         #expect(savedHat.targetRowCount == nil)
     }
+
+    @Test func projectWithoutTargetIsNotReachedAndHasNoProgress() {
+        let project = makeProject(rows: 5)
+
+        #expect(!project.isTargetReached)
+        #expect(project.progress == nil)
+    }
+
+    // Each tuple becomes one run: (rows, target, expected).
+    @Test(arguments: [
+        (119, 120, false),
+        (120, 120, true),
+        (121, 120, true),
+        (0, 1, false),
+        (1, 1, true),
+    ])
+    func isTargetReachedAtOrPastTarget(rows: Int, target: Int, expected: Bool) {
+        let project = makeProject(rows: rows, target: target)
+
+        #expect(project.isTargetReached == expected)
+    }
+
+    // Every expected value is exact in binary floating point, so == is safe.
+    @Test(arguments: [
+        (0, 120, 0.0),
+        (60, 120, 0.5),
+        (120, 120, 1.0),
+        (180, 120, 1.0),
+    ])
+    func progressIsFractionCappedAtOne(rows: Int, target: Int, expected: Double) {
+        let project = makeProject(rows: rows, target: target)
+
+        #expect(project.progress == expected)
+    }
+
+    @Test func targetBelowCountIsAlreadyReached() {
+        let project = makeProject(rows: 50)
+
+        project.setTarget(30)
+
+        #expect(project.targetRowCount == 30)
+        #expect(project.isTargetReached)
+        #expect(project.progress == 1.0)
+    }
+
+    @Test func targetIsReachedAgainAfterRemovingARow() {
+        let project = makeProject(rows: 120, target: 120)
+
+        project.removeRow()
+        #expect(!project.isTargetReached)
+
+        project.addRow()
+        #expect(project.isTargetReached)
+    }
 }
