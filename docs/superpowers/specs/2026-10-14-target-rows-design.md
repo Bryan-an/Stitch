@@ -1,6 +1,6 @@
 # Target row count
 
-Status: approved design, not yet implemented
+Status: implemented
 Date: 2026-10-14
 
 ## Goal
@@ -198,7 +198,7 @@ Each step builds, runs and is committed on its own. Steps 2 and 3 are test-first
 
 - `README.md`: Status (line 13) mentions the optional target and lists what is still unverified, including the success haptic (no physical iPhone). The project tree gets `│   ├── SetTargetView.swift    # Sheet to set or remove a target` right after the `CounterView.swift` line. The roadmap line "Target row count and pattern-repeat reminders" splits into a ticked "Target row count" and an open "Pattern-repeat reminders".
 - `CLAUDE.md`: the project paragraph mentions the target and that Reset keeps it. The `KnittingProject` bullet adds that `targetRowCount` is `private(set)`, changes only through `setTarget(_:)` and does not touch `updatedAt`, and that `isTargetReached` and `progress` are computed. The `CounterView` bullet adds that its toolbar opens `SetTargetView`. The previews bullet adds `projectWithTarget(rows:target:)`. New note: new stored properties should be optional (verified with `targetRowCount`, M1 and M2); a non-optional one needs its default declared on the property itself, not only in `init`, is not verified here, and must be checked against a store from the previous build. New note: the Simulator plays no haptics.
-- This spec's status becomes "implemented", and the appendix is described as the original sketch, with the shipped files as the source of truth. The multiple-projects spec still says "approved design, not yet implemented" (line 3); update it to "implemented" in the same commit.
+- This spec's status becomes "implemented", and the appendix is described as the original sketch, with the shipped files as the source of truth. The multiple-projects spec's status (line 3) was updated to "implemented" in the same commit.
 
 ### Out of scope
 
@@ -215,7 +215,7 @@ Each step builds, runs and is committed on its own. Steps 2 and 3 are test-first
 
 ## Appendix: approved section 2 code sketch
 
-Builds with `xcodebuild` for iOS Simulator, macOS and visionOS once split into its real files (with `import SwiftData` added to `SetTargetView.swift`); not yet run. The model and `PreviewData` parts are stubs showing the additions.
+The original sketch from the design. The shipped files in `Stitch/` are the source of truth.
 
 ```swift
 import Foundation

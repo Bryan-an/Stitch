@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/460cc218-50af-4db8-8672-1b80eb1a7fef
 
 ## Status
 
-MVP complete, plus multiple projects: each knitting project has its own row count (stored with SwiftData), projects can be created, renamed and deleted, and the app reopens where you left off. Tested on iPhone and iPad simulators; iPhone landscape and Apple Vision are not verified yet.
+MVP complete, plus multiple projects and row targets: each knitting project has its own row count (stored with SwiftData) and an optional target with progress, projects can be created, renamed and deleted, and the app reopens where you left off. Tested on iPhone and iPad simulators; iPhone landscape, the Mac app, Apple Vision and the success haptic at the target (no physical iPhone yet) are not verified.
 
 ## MVP scope
 
@@ -46,6 +46,7 @@ Stitch/
 │   ├── ProjectListView.swift  # List, create, rename, delete
 │   ├── NewProjectView.swift   # New-project sheet
 │   ├── CounterView.swift      # Counter for one project
+│   ├── SetTargetView.swift    # Sheet to set or remove a target
 │   ├── KnittingProject.swift  # SwiftData model and counting rules
 │   ├── PreviewData.swift      # In-memory sample data for previews
 │   ├── AppIcon.icon/          # App icon (Icon Composer)
@@ -76,7 +77,8 @@ Ideas for after the MVP, roughly in order. None of them are commitments.
 - [x] Keep the screen awake while counting (iOS, iPadOS and visionOS)
 - [x] Custom app icon (iPhone, iPad and Mac; visionOS still needs its own icon)
 - [x] Multiple knitting projects, each with its own counter (SwiftData)
-- [ ] Target row count and pattern-repeat reminders
+- [x] Target row count
+- [ ] Pattern-repeat reminders
 - [ ] Spanish localization through a String Catalog
 
 ## Conventions
