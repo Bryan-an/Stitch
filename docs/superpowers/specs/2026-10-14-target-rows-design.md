@@ -51,7 +51,7 @@ Rules:
 
 - The pattern matches `rowCount`: `private(set)` plus one method that enforces the rule. A target of 0 or less cannot be stored; `setTarget(0)`, `setTarget(-5)` and `setTarget(nil)` remove it.
 - `setTarget` does not change `updatedAt`, which still means "last time the count changed", so setting a target does not move the project up the list.
-- Existing saved projects get no target: SwiftData migrates them automatically (lightweight migration) to `targetRowCount == nil`. To be checked on the simulator with existing data.
+- Existing saved projects get no target: SwiftData migrates them automatically (lightweight migration) to `targetRowCount == nil`. Checked on the simulator with existing data (M2).
 - `isTargetReached` and `progress` are computed, not stored, so they can never fall out of step with `rowCount` and `targetRowCount`.
 
 Tests promised in section 1 (`StitchTests/KnittingProjectTests.swift`):
@@ -177,6 +177,14 @@ For the runtime counter checks, set a small target such as 3 in the sheet so eve
 | M14 | Physical iPhone on iOS 27, if available | Needs a Team and a real bundle identifier (README, "Running on a physical device"); set them in Xcode and do not commit the resulting `project.pbxproj` change. With target 3: 2 → 3 success; 3 → 4 medium; 4 → 3 light; 2 → 3 success again; Reset light; saving or removing a target plays nothing; switching to a project already at or past its target plays nothing. VoiceOver reads the counter as in M11. Without a device, M14 is recorded as unverified. |
 
 Every step runs the iOS build and `KnittingProjectTests`; steps that touch views also build macOS and visionOS.
+
+### Manual check results (2026-10-15)
+
+Run on the iOS 27.0 simulators against the final build, driven by simulator automation (the accessibility tree read with AXe, taps and typing through the simulator) instead of Xcode's UI.
+
+- Passed: M1; M2 (Scarf 5 and Hat 0 kept, the new column reads nil); M4; M5 with typed input; M6; M7; M8 at human typing speed; M9; M10 after "Keep the target status readable at large text sizes" (at the largest accessibility size the status line was cut off before it); M11, read from the accessibility tree instead of Accessibility Inspector; M13 (build only). Dark mode was checked in the running app instead of the canvas.
+- Not run: M3 canvas previews; M12 native Mac; real text paste (the simulator's pasteboard follows the Mac's, so test text could not be placed on it); the software number pad (the simulator was in hardware-keyboard mode, so the pad stayed hidden); iPhone landscape; M14 haptics (no physical iPhone).
+- Known limitation: the `onChange` filter assumes one edit per update. When several characters arrive in one update (automated typing, possibly hardware key repeat), the field can show more than `draft` holds, for example "123467" while Save would store 1234. Typing at human speed, including at a full field, behaves. Save, the footer and the stored target always use the filtered `draft`.
 
 ### Order of work
 
