@@ -143,6 +143,9 @@ struct CounterView: View {
                 .tint(project.isTargetReached ? .green : .accentColor)
                 .frame(maxWidth: 280)
         }
+        // Like the count: shrink to one line instead of cutting off at large text sizes.
+        .lineLimit(1)
+        .minimumScaleFactor(0.4)
     }
 
     private var targetButtonTitle: LocalizedStringKey {
