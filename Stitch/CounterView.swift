@@ -10,6 +10,7 @@ struct CounterView: View {
     let project: KnittingProject
 
     @State private var isShowingResetAlert = false
+    @State private var isShowingTargetSheet = false
 
     private let buttonHeight: CGFloat = 72
 
@@ -56,6 +57,15 @@ struct CounterView: View {
         .frame(maxWidth: 500)
         .navigationTitle(project.name)
         .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    isShowingTargetSheet = true
+                } label: {
+                    Label(targetButtonTitle, systemImage: "target")
+                }
+            }
+        }
         .sensoryFeedback(trigger: project.rowCount) { oldValue, newValue in
             newValue > oldValue ? .impact(weight: .medium) : .impact(weight: .light)
         }
@@ -75,6 +85,13 @@ struct CounterView: View {
         } message: {
             Text("The row count will go back to 0.")
         }
+        .sheet(isPresented: $isShowingTargetSheet) {
+            SetTargetView(project: project)
+        }
+    }
+
+    private var targetButtonTitle: LocalizedStringKey {
+        project.targetRowCount == nil ? "Set Target" : "Edit Target"
     }
 }
 
