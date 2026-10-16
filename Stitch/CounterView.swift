@@ -62,8 +62,12 @@ struct CounterView: View {
                 }
             }
         }
-        .sensoryFeedback(trigger: project.rowCount) { oldValue, newValue in
-            newValue > oldValue ? .impact(weight: .medium) : .impact(weight: .light)
+        .sensoryFeedback(trigger: project.rowCount) { oldCount, newCount in
+            // Success only on the step that crosses the target. Setting a target never changes rowCount, so it never fires.
+            if let target = project.targetRowCount, oldCount < target, newCount >= target {
+                return .success
+            }
+            return newCount > oldCount ? .impact(weight: .medium) : .impact(weight: .light)
         }
         #if canImport(UIKit)
         .onAppear {
