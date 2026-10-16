@@ -86,7 +86,7 @@ struct CounterView: View {
         }
     }
 
-    // The count and, when a target is set, its status.
+    // The count and, when a target is set, its status. VoiceOver reads it as one element.
     private var countDisplay: some View {
         VStack(spacing: 12) {
             Text("\(project.rowCount)")
@@ -99,6 +99,9 @@ struct CounterView: View {
                 targetStatus(target: target, progress: progress)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Row count")
+        .accessibilityValue(rowCountSummary)
     }
 
     private func targetStatus(target: Int, progress: Double) -> some View {
@@ -136,6 +139,16 @@ struct CounterView: View {
 
     private var targetButtonTitle: LocalizedStringKey {
         project.targetRowCount == nil ? "Set Target" : "Edit Target"
+    }
+
+    private var rowCountSummary: LocalizedStringKey {
+        guard let target = project.targetRowCount else {
+            return "\(project.rowCount)"
+        }
+        if project.isTargetReached {
+            return "\(project.rowCount) of \(target) rows, target reached"
+        }
+        return "\(project.rowCount) of \(target) rows, \(target - project.rowCount) to go"
     }
 }
 
