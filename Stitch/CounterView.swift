@@ -79,7 +79,11 @@ struct CounterView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("The row count will go back to 0.")
+            if project.targetRowCount == nil {
+                Text("The row count will go back to 0.")
+            } else {
+                Text("The row count will go back to 0. Your target is kept.")
+            }
         }
         .sheet(isPresented: $isShowingTargetSheet) {
             SetTargetView(project: project)
