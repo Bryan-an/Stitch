@@ -187,6 +187,8 @@ struct KnittingProjectTests {
     func isTargetReachedAtOrPastTarget(rows: Int, target: Int, expected: Bool) {
         let project = makeProject(rows: rows, target: target)
 
+        // Counting is never capped at the target.
+        #expect(project.rowCount == rows)
         #expect(project.isTargetReached == expected)
     }
 
@@ -200,6 +202,7 @@ struct KnittingProjectTests {
     func progressIsFractionCappedAtOne(rows: Int, target: Int, expected: Double) {
         let project = makeProject(rows: rows, target: target)
 
+        #expect(project.rowCount == rows)
         #expect(project.progress == expected)
     }
 
@@ -208,6 +211,8 @@ struct KnittingProjectTests {
 
         project.setTarget(30)
 
+        // Lowering the target below the count never removes rows.
+        #expect(project.rowCount == 50)
         #expect(project.targetRowCount == 30)
         #expect(project.isTargetReached)
         #expect(project.progress == 1.0)

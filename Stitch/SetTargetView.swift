@@ -48,7 +48,9 @@ struct SetTargetView: View {
                         .focused($isFieldFocused)
                         .onSubmit(save)
                         .onChange(of: draft) { _, newValue in
-                            // Keep only up to `maxDigits` ASCII digits; letters, spaces and pasted text are dropped.
+                            // Keep only up to `maxDigits` ASCII digits; anything else, typed or pasted, is filtered out.
+                            // Known limitation: several characters in one update (e.g. key repeat) can leave the
+                            // field showing more than `draft` holds. Save and the footer always use `draft`.
                             let digits = newValue.filter { $0.isASCII && $0.isNumber }
                             draft = String(digits.prefix(maxDigits))
                         }
