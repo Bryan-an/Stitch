@@ -34,4 +34,25 @@ enum PreviewData {
         }
         return project
     }
+
+    /// One project with `rows` counted toward `target`, in its own in-memory
+    /// store. Keep the returned container alive while the project is used.
+    static func projectWithTarget(rows: Int, target: Int) -> (container: ModelContainer, project: KnittingProject) {
+        do {
+            let container = try ModelContainer(
+                for: KnittingProject.self,
+                configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            )
+            let project = KnittingProject(name: "Scarf")
+            // Insert first, then change: the model must belong to a context.
+            container.mainContext.insert(project)
+            project.setTarget(target)
+            for _ in 0..<rows {
+                project.addRow()
+            }
+            return (container, project)
+        } catch {
+            fatalError("Could not create the preview container: \(error)")
+        }
+    }
 }
