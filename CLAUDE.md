@@ -18,10 +18,10 @@ Also check the other platforms compile by swapping the destination for `'platfor
 
 Deployment targets are iOS, macOS and visionOS 27.0, so the simulator runtime must be iOS 27+.
 
-Run the model tests (on the iOS simulator):
+Run the tests (on the iOS simulator): `KnittingProjectTests` for the model and `SetTargetInputTests` for the target field's key filter:
 
 ```bash
-xcodebuild test -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -only-testing:StitchTests/KnittingProjectTests
+xcodebuild test -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -only-testing:StitchTests
 ```
 
 Run a single test by appending its name, e.g. `-only-testing:StitchTests/KnittingProjectTests/removeRowAtZeroChangesNothing()`.

@@ -23,6 +23,17 @@ struct SetTargetView: View {
         return value
     }
 
+    /// Whether a hardware-keyboard press is refused before it reaches the field: any typed
+    /// character that is not an ASCII digit. Shortcuts (Command, Control, Option) and keys
+    /// that type no text, such as Delete, Return, Tab or the arrows, pass through.
+    static func refusesKeyPress(characters: String, modifiers: EventModifiers) -> Bool {
+        guard modifiers.intersection([.command, .control, .option]).isEmpty else { return false }
+        return characters.contains { character in
+            character.isLetter || character.isPunctuation || character.isSymbol
+                || character == " " || (character.isNumber && !character.isASCII)
+        }
+    }
+
     private var footer: LocalizedStringKey {
         guard let newTarget else {
             return "Type the number of rows in your pattern."
@@ -47,10 +58,18 @@ struct SetTargetView: View {
                         .multilineTextAlignment(.center)
                         .focused($isFieldFocused)
                         .onSubmit(save)
+                        // Hardware keyboards only: refuse a non-digit before the field applies it.
+                        // Removing it afterwards in onChange races with keys still arriving, which
+                        // could drop the digits typed after it ("1,200" became "1").
+                        .onKeyPress(phases: [.down, .repeat]) { press in
+                            Self.refusesKeyPress(characters: press.characters, modifiers: press.modifiers)
+                                ? .handled : .ignored
+                        }
                         .onChange(of: draft) { _, newValue in
-                            // Keep only up to `maxDigits` ASCII digits; anything else, typed or pasted, is filtered out.
-                            // Known limitation: several characters in one update (e.g. key repeat) can leave the
-                            // field showing more than `draft` holds. Save and the footer always use `draft`.
+                            // Keep only up to `maxDigits` ASCII digits. This handles paste, the software
+                            // keyboard and the 4-digit cap. Known limitation: a burst of digits past the cap,
+                            // faster than anyone types, can leave the field showing more than `draft`
+                            // holds. Save and the footer always use `draft`.
                             let digits = newValue.filter { $0.isASCII && $0.isNumber }
                             draft = String(digits.prefix(maxDigits))
                         }

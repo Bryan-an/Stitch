@@ -98,7 +98,7 @@ Tests promised in section 1 (`StitchTests/KnittingProjectTests.swift`):
 
 - Same Cancel/Save toolbar as `NewProjectView`. Opens at `.presentationDetents([.medium])`.
 - One number field, prefilled with the current target and focused when the sheet opens (`@FocusState` set in `onAppear`). iPhone shows the number pad; Return (`onSubmit`) saves.
-- Digits only, at most 4 (9999 rows), filtered in `onChange`: pasted "120 rows" becomes 120 and "1,200" becomes 1200. Save is disabled while the field is empty or 0.
+- Digits only, at most 4 (9999 rows), filtered in `onChange`: pasted "120 rows" becomes 120 and "1,200" becomes 1200. Save is disabled while the field is empty or 0. On a hardware keyboard, `.onKeyPress` also refuses a typed non-digit before the field applies it (added after the manual checks, see below).
 - Live footer: "You are at 42, so 78 to go." or "You are already at 130, so this target is reached. You can keep counting."
 - **Remove Target** appears only when a target exists, with no confirmation (the count is kept).
 - The draft is seeded in `init` with `State(initialValue:)` so the field never shows empty before the saved value.
@@ -184,7 +184,9 @@ Run on the iOS 27.0 simulators against the final build, driven by simulator auto
 
 - Passed: M1; M2 (Scarf 5 and Hat 0 kept, the new column reads nil); M4; M5 with typed input; M6; M7; M8 at human typing speed; M9; M10 after "Keep the target status readable at large text sizes" (at the largest accessibility size the status line was cut off before it); M11, read from the accessibility tree instead of Accessibility Inspector; M13 (build only). Dark mode was checked in the running app instead of the canvas.
 - Not run: M3 canvas previews; M12 native Mac; real text paste (the simulator's pasteboard follows the Mac's, so test text could not be placed on it); the software number pad (the simulator was in hardware-keyboard mode, so the pad stayed hidden); iPhone landscape; M14 haptics (no physical iPhone).
-- Known limitation: the `onChange` filter assumes one edit per update. When several characters arrive in one update (automated typing, possibly hardware key repeat), the field can show more than `draft` holds, for example "123467" while Save would store 1234. Typing at human speed, including at a full field, behaves. Save, the footer and the stored target always use the filtered `draft`.
+- Found: `onChange` corrects the field only after the field has applied an edit, so the correction races with keys still arriving. In a burst of typing, "1,200" ended at "1" (the digits after the comma were lost) and a full field could show "123467" while `draft` held 1234.
+- Fixed (2026-10-16): on hardware keyboards, `.onKeyPress` refuses typed non-digits before the field applies them, so they never need correcting. Checked on iPhone 17 with automated typing: "1,200" and "12a 3" typed in one burst give 1200 and 123; bursts and 10 ms key repeat at a full field keep "1234"; Return still saves. The key filter itself is covered by `SetTargetInputTests`. Delete could not be sent by the automation tools and macOS is build-only.
+- Remaining limitation: the 4-digit cap still trims in `onChange`, so a burst of digits past the cap could in theory leave extra digits on screen; not seen again in the runs above. Save, the footer and the stored target always use the filtered `draft`.
 
 ### Order of work
 
