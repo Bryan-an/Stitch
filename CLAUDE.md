@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Stitch is a minimal SwiftUI knitting row counter and a learning project for native iOS development. See `README.md` for MVP scope and roadmap. The app keeps a list of knitting projects (SwiftData), each with its own counter screen: large row count, **+** (primary, largest tap target), **−** (disabled at 0), **Reset** with a confirmation alert.
+Stitch is a minimal SwiftUI knitting row counter and a learning project for native iOS development. See `README.md` for MVP scope and roadmap. The app keeps a list of knitting projects (SwiftData), each with its own counter screen: large row count, **+** (primary, largest tap target), **−** (disabled at 0), **Reset** with a confirmation alert (it keeps the target), and an optional target row count with progress, set in a sheet from the toolbar.
 
 ## Build and run
 
@@ -18,10 +18,10 @@ Also check the other platforms compile by swapping the destination for `'platfor
 
 Deployment targets are iOS, macOS and visionOS 27.0, so the simulator runtime must be iOS 27+.
 
-Run the model tests (on the iOS simulator):
+Run the tests (on the iOS simulator): `KnittingProjectTests` for the model and `SetTargetInputTests` for the target field's key filter:
 
 ```bash
-xcodebuild test -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -only-testing:StitchTests/KnittingProjectTests
+xcodebuild test -project Stitch.xcodeproj -scheme Stitch -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -only-testing:StitchTests
 ```
 
 Run a single test by appending its name, e.g. `-only-testing:StitchTests/KnittingProjectTests/removeRowAtZeroChangesNothing()`.
@@ -30,11 +30,13 @@ SourceKit often reports "Cannot find '…' in scope" for types from other files 
 
 ## Architecture and build settings that matter
 
-- `MyApp` attaches `.modelContainer(for: KnittingProject.self)`. `ContentView` is a `NavigationSplitView` that owns the `@Query` (sorted by `updatedAt`, newest first) and the selection, saved as a UUID string under `@AppStorage("selectedProjectID")`. On iPhone, going back to the list clears the selection, so the app reopens where the user left off (counter or list). `ProjectListView` lists, creates (via `NewProjectView`), renames and deletes projects; `CounterView` is the counter for one project.
-- `KnittingProject` owns the counting rules: `rowCount` is `private(set)` and changes only through `addRow()`, `removeRow()` and `reset()`, which also update `updatedAt`. Views call these methods rather than setting properties.
+- `MyApp` attaches `.modelContainer(for: KnittingProject.self)`. `ContentView` is a `NavigationSplitView` that owns the `@Query` (sorted by `updatedAt`, newest first) and the selection, saved as a UUID string under `@AppStorage("selectedProjectID")`. On iPhone, going back to the list clears the selection, so the app reopens where the user left off (counter or list). `ProjectListView` lists, creates (via `NewProjectView`), renames and deletes projects; `CounterView` is the counter for one project; its toolbar opens `SetTargetView` in a sheet to set, edit or remove the target.
+- `KnittingProject` owns the counting rules: `rowCount` is `private(set)` and changes only through `addRow()`, `removeRow()` and `reset()`, which also update `updatedAt`. `targetRowCount` is `private(set)` too and changes only through `setTarget(_:)` (nil or a value below 1 removes it), which does not touch `updatedAt`; `isTargetReached` and `progress` are computed from the two. Views call these methods rather than setting properties.
 - `CounterView` takes a plain `let project` (SwiftData models are observable). `ContentView` gives it `.id(project.id)` so switching projects creates a fresh counter instead of firing the haptic.
-- Previews use `PreviewData.container` (in-memory sample projects). Create a `ModelContainer` before instantiating a model, in previews and in tests.
+- Previews use `PreviewData.container` (in-memory sample projects), or `PreviewData.projectWithTarget(rows:target:)`, which returns a project with a target in its own in-memory container (keep the container alive while the project is used). Create a `ModelContainer` before instantiating a model, in previews and in tests.
 - SwiftData relies on autosave (no explicit `save()` calls). Changes made a few seconds before the process is killed can be lost; when checking persistence on the simulator, press Home before stopping the app.
+- New stored properties on `KnittingProject` should be optional: SwiftData then migrates existing stores automatically (verified with `targetRowCount`). A non-optional property needs its default declared on the property itself, not only in `init`; that case is not verified here, so check any schema change against a store saved by the previous build before committing.
+- The iOS Simulator plays no haptics; `.sensoryFeedback` can only be checked on a physical iPhone.
 - The project uses folder-synchronized groups (`PBXFileSystemSynchronizedRootGroup`): new files in `Stitch/` and `StitchTests/` are picked up automatically. Never edit `project.pbxproj` to add files.
 - Swift 5 language mode, but with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and `SWIFT_APPROACHABLE_CONCURRENCY = YES`: types are implicitly `@MainActor` unless marked otherwise (`nonisolated`).
 - `SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES`: each file must explicitly import the modules whose members it uses (e.g. `Foundation` for `SortDescriptor` or `trimmingCharacters`, `SwiftData` for `.modelContainer` and `\.modelContext`).

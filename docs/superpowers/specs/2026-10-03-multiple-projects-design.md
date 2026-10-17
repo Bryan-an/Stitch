@@ -1,6 +1,6 @@
 # Multiple knitting projects with SwiftData
 
-Status: approved design, not yet implemented
+Status: implemented
 Date: 2026-10-03
 
 ## Goal

@@ -16,9 +16,19 @@ struct KnittingProjectTests {
         )
     }
 
-    private func makeProject(named name: String = "Scarf") -> KnittingProject {
+    // Insert first, then change: a model must belong to a context before it
+    // is used. The defaults keep the older tests' calls unchanged.
+    private func makeProject(
+        named name: String = "Scarf",
+        rows: Int = 0,
+        target: Int? = nil
+    ) -> KnittingProject {
         let project = KnittingProject(name: name)
         container.mainContext.insert(project)
+        project.setTarget(target)
+        for _ in 0..<rows {
+            project.addRow()
+        }
         return project
     }
 
@@ -87,5 +97,134 @@ struct KnittingProjectTests {
         let names = try container.mainContext.fetch(descriptor).map(\.name)
 
         #expect(names == ["Hat", "Socks", "Scarf"])
+    }
+
+    @Test func newProjectHasNoTarget() {
+        let project = makeProject()
+
+        #expect(project.targetRowCount == nil)
+    }
+
+    @Test func setTargetStoresTarget() {
+        let project = makeProject()
+
+        project.setTarget(120)
+        #expect(project.targetRowCount == 120)
+
+        project.setTarget(80)
+        #expect(project.targetRowCount == 80)
+    }
+
+    // One test function, run once per argument. Each run gets its own suite
+    // instance, so its own in-memory store.
+    @Test(arguments: [nil, 0, -5] as [Int?])
+    func setTargetBelowOneRemovesTarget(target: Int?) {
+        // Start with a target, otherwise there would be nothing to remove.
+        let project = makeProject(target: 120)
+
+        project.setTarget(target)
+
+        #expect(project.targetRowCount == nil)
+    }
+
+    @Test func setTargetChangesNeitherRowCountNorUpdatedAt() {
+        let project = makeProject(rows: 42)
+        // A fixed date makes the check exact instead of depending on timing.
+        let updatedAt = Date(timeIntervalSince1970: 100)
+        project.updatedAt = updatedAt
+
+        project.setTarget(120)
+        project.setTarget(nil)
+
+        #expect(project.rowCount == 42)
+        #expect(project.updatedAt == updatedAt)
+    }
+
+    @Test func resetKeepsTarget() {
+        let project = makeProject(rows: 3, target: 120)
+
+        project.reset()
+
+        #expect(project.rowCount == 0)
+        #expect(project.targetRowCount == 120)
+    }
+
+    @Test func savedTargetIsReadByAnotherContext() throws {
+        let scarf = makeProject(named: "Scarf", rows: 42, target: 120)
+        let hat = makeProject(named: "Hat")
+        try container.mainContext.save()
+
+        // mainContext would hand back the same objects, still holding their
+        // values in memory. A new context has its own instances, so it can
+        // only see what was actually stored.
+        let otherContext = ModelContext(container)
+        let fetched = try otherContext.fetch(FetchDescriptor<KnittingProject>())
+        let savedScarf = try #require(fetched.first(where: { $0.name == "Scarf" }))
+        let savedHat = try #require(fetched.first(where: { $0.name == "Hat" }))
+
+        #expect(savedScarf !== scarf)
+        #expect(savedScarf.rowCount == 42)
+        #expect(savedScarf.targetRowCount == 120)
+        #expect(savedHat !== hat)
+        #expect(savedHat.targetRowCount == nil)
+    }
+
+    @Test func projectWithoutTargetIsNotReachedAndHasNoProgress() {
+        let project = makeProject(rows: 5)
+
+        #expect(!project.isTargetReached)
+        #expect(project.progress == nil)
+    }
+
+    // Each tuple becomes one run: (rows, target, expected).
+    @Test(arguments: [
+        (119, 120, false),
+        (120, 120, true),
+        (121, 120, true),
+        (0, 1, false),
+        (1, 1, true),
+    ])
+    func isTargetReachedAtOrPastTarget(rows: Int, target: Int, expected: Bool) {
+        let project = makeProject(rows: rows, target: target)
+
+        // Counting is never capped at the target.
+        #expect(project.rowCount == rows)
+        #expect(project.isTargetReached == expected)
+    }
+
+    // Every expected value is exact in binary floating point, so == is safe.
+    @Test(arguments: [
+        (0, 120, 0.0),
+        (60, 120, 0.5),
+        (120, 120, 1.0),
+        (180, 120, 1.0),
+    ])
+    func progressIsFractionCappedAtOne(rows: Int, target: Int, expected: Double) {
+        let project = makeProject(rows: rows, target: target)
+
+        #expect(project.rowCount == rows)
+        #expect(project.progress == expected)
+    }
+
+    @Test func targetBelowCountIsAlreadyReached() {
+        let project = makeProject(rows: 50)
+
+        project.setTarget(30)
+
+        // Lowering the target below the count never removes rows.
+        #expect(project.rowCount == 50)
+        #expect(project.targetRowCount == 30)
+        #expect(project.isTargetReached)
+        #expect(project.progress == 1.0)
+    }
+
+    @Test func targetIsReachedAgainAfterRemovingARow() {
+        let project = makeProject(rows: 120, target: 120)
+
+        project.removeRow()
+        #expect(!project.isTargetReached)
+
+        project.addRow()
+        #expect(project.isTargetReached)
     }
 }
